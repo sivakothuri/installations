@@ -26,17 +26,19 @@ import org.codehaus.groovy.runtime.InvokerHelper;
  * # Groovy needs to be installed and GROOVY_HOME environment variable should be set
  * # Process Platform needs to be installed and CORDYS_HOME environment variable should be set
  * # ActiveMQ needs to be installed and MQ_HOME environment variable should be set
+ * # It need the following environment variables to be set 'cordys.host','cordys.user','cordys.pwd'  
  */
 class build extends Script {
 	def prop = ['orgDN':'','version':'','build':''];
 	
+	
 	def packages = ['OpenText JMS Connector'];
-	def hostName = "http://skothuri4t5zd02/cordys" //"http://skothuri4t5zd02/cordys";
-	def cordysUser = "skothuri" //"skothuri"
-	def cordysPwd = "s" //"s"
+	def hostName = System.getenv("cordys.host")
+	def cordysUser = System.getenv("cordys.user")
+	def cordysPwd = System.getenv("cordys.pwd")
 	def undeploy = false;
 	def configurationName = "junitconfiguration"
-	def activeMQHome = System.getenv("MQ_HOME");
+	def activeMQHome = System.getenv("MQ_HOME")
 	
 	
 	String aboutCordys = """
@@ -54,10 +56,36 @@ class build extends Script {
 		System.setProperty('sendsoap.response.to.console','true');
 		System.setProperty('sendsoap.request.to.console','true');
 		
-		initializeProperties()
+		//If validation fails don't proceed further.
+		if(validateInputs() == false) {
+			return;
+		}
+		
+		doWork()
 	}
 
-	def initializeProperties()
+	def validateInputs()
+	{
+		if(!hostName) {
+			log.error "'cordys.host' is not set. Set this environment variable value to your Process Platform URL. Example : 'http://skothuri4t5zd02/cordys' "
+			return false;
+		}
+		if(!cordysUser) {
+			log.error "'cordys.user' is not set. Set this environment variable value to your Process Platform User."
+			return false;
+		}
+		if(!cordysPwd) {
+			log.error "'cordys.pwd' is not set. Set this environment variable value to your Process Platform Password."
+			return false;
+		}
+		if(!activeMQHome) {
+			log.error "'MQ_HOME' is not set. Set this environment variable pointing to the Active MQ installation directory. "
+			return false;
+		}
+		return true;
+	}
+	
+	def doWork()
 	{
 		def root = invokeSoapRequest(aboutCordys);
 		
