@@ -5,8 +5,6 @@
 
 import groovy.util.logging.Slf4j;
 import groovy.util.slurpersupport.GPathResult;
-
-
 import groovy.xml.XmlUtil;
 
 import org.codehaus.groovy.runtime.InvokerHelper;
@@ -56,33 +54,26 @@ class build extends Script {
 		System.setProperty('sendsoap.response.to.console','true');
 		System.setProperty('sendsoap.request.to.console','true');
 		
-		//If validation fails don't proceed further.
-		if(validateInputs() == false) {
-			return;
-		}
-		
+		//Validating the input parameters
+		validateInputs()
+			
 		doWork()
 	}
 
 	def validateInputs()
 	{
 		if(!hostName) {
-			log.error "'cordys.host' is not set. Set this environment variable value to your Process Platform URL. Example : 'http://skothuri4t5zd02/cordys' "
-			return false;
+			throw new RuntimeException("'cordys.host' is not set. Set this environment variable value to your Process Platform URL. Example : 'http://skothuri4t5zd02/cordys' ")
 		}
 		if(!cordysUser) {
-			log.error "'cordys.user' is not set. Set this environment variable value to your Process Platform User."
-			return false;
+			throw new RuntimeException("'cordys.user' is not set. Set this environment variable value to your Process Platform User.")
 		}
 		if(!cordysPwd) {
-			log.error "'cordys.pwd' is not set. Set this environment variable value to your Process Platform Password."
-			return false;
+			throw new RuntimeException("'cordys.pwd' is not set. Set this environment variable value to your Process Platform Password.");
 		}
 		if(!activeMQHome) {
-			log.error "'MQ_HOME' is not set. Set this environment variable pointing to the Active MQ installation directory. "
-			return false;
+			throw new RuntimeException("'MQ_HOME' is not set. Set this environment variable pointing to the Active MQ installation directory.");
 		}
-		return true;
 	}
 	
 	def doWork()
