@@ -53,6 +53,8 @@ class build extends Script {
 		System.setProperty('sendsoap.saml.password', "$cordysPwd");
 		System.setProperty('sendsoap.response.to.console','true');
 		System.setProperty('sendsoap.request.to.console','true');
+		
+		initializeProperties()
 	}
 
 	def initializeProperties()
@@ -291,7 +293,7 @@ class build extends Script {
 		tmpFile.deleteOnExit()
 		tmpFile.withWriter { out -> out.writeLine( requestXml ) }
 
-		response = new GroovyShell().run(new File("src/soapClient.groovy"),"$hostName" , tmpFile.getAbsolutePath());
+		response = new GroovyShell().run(new File("groovy/soapClient.groovy"),"$hostName" , tmpFile.getAbsolutePath());
 		return new XmlSlurper().parseText(response)
 	}
 	
@@ -361,6 +363,6 @@ class build extends Script {
 		</SOAP:Envelope>"""
 	}
 	static void main(String[] args) {
-		InvokerHelper.runScript(Main, args)
+		InvokerHelper.runScript(build, args)
 	}
 }
